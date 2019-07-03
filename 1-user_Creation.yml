@@ -1,0 +1,31 @@
+---
+# Manage Users
+# https://docs.ansible.com/ansible/latest/modules/user_module.html
+- hosts: test-server
+  user: root
+  become_method: 
+  become_user: yes
+  tasks:
+
+        - name: "Adding user"
+          user:
+                name: rohit
+                comment: This is rohit Kumar 
+                uid: 1050
+                #group: admin,hr
+                shell: /bin/bash
+                expires: -1
+                append: yes
+
+        - name: "ssh Key Generate"
+          user: 
+                name: rohit
+                generate_ssh_key: yes
+                ssh_key_bits: 2048
+                ssh_key_file: .ssh/id_rsa
+
+#        - name: "Removing user"
+#          user: 
+#                name: rohit 
+#                state: absent
+#                remove: yes

@@ -1,0 +1,44 @@
+---
+- hosts: test-server
+  remote_user : root
+
+# This is created for installtion package nginx
+  tasks:
+#### nginx Package
+        - name : "Redhat family nginx Package Installation"
+          yum: name=nginx state=latest
+          when: 
+                - ansible_facts['os_family'] == "RedHat"
+                - ansible_facts['distribution'] == "CentOS"
+
+        - name: "Nginx installation for Debian"
+          package: name=nginx state=present
+          when: ansible_facts['os_family'] == "Debian"
+
+#### Port allow
+        #- name: "Enabling ports in Firewall for Rhel Family."
+          #firewalld: service=http permanent=yes state=enabled
+          #firewalld: source=192.168.57.0/24 state=enabled zone=public permanent=yes
+          #firewalld: rich_rule='rule service name=ftp audit limit value="1/m" accept' permanent=yes state=enabled
+          #firewalld: masquerade=yes state=enabled permanent=yes zone=public
+        - name: "Allow port 80/tcp" 
+          firewalld: port=80/tcp state=enabled permanent=yes immediate=yes
+          when: ansible_facts['os_family'] == "RedHat"
+
+        - name: "Allow port 80/udp"
+          firewalld: port=80/udp state=enabled permanent=yes immediate=yes
+          when: 
+                - ansible_facts['os_family'] == "RedHat"
+                #- ansible_facts['distribution'] == "centos" and ansible_fact['distribution_version'] == "7"
+
+        - name: "Enabling ports in Firewall for Debian"
+          iptables: chain=input protocol=tcp destination_port=22 jump=accept
+          when: ansible_facts['os_family'] == "Debian"
+
+        - name: "Firwalld Going to restart"
+          service: name=firewalld state=restarted
+          when:
+                - ansible_facts['os_family'] == "RedHat"
+
+        - name: "Nginx Service Starting"
+          service: name=nginx state=started
