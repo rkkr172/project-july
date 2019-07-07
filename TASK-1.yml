@@ -1,0 +1,37 @@
+---
+#=> Create a user on the remote host. The name of this user is defined at the top of the playbook as a variable.
+#=> Set the password for the user created. This is mainly so this use has a full presence on the server and can also be used to test commands on the server before porting them back into Ansible playbooks. Again, the password is set using a variable at the top of the playbook.
+#=> Use the authorized_key Ansible module to copy the public ssh key (kept in the same folder as the Ansible project) and place it on the server in the .ssh/authorized_keys file. After this step it is possible to connect to the server using the ssh keys alone. There is still one step left to do though.
+#=> The final step is to allow the 'ansibleremote' user to complete 'sudo' actions on the remote host without needing to enter a password. We do this by adding a line to the /etc/sudoers file.
+
+- hosts: all
+  vars: 
+    remoteuser: 'ram' 
+    remotepassword: 'password'
+  tasks:
+  - name: "setup | Create user on remote_host"
+    command: useradd -m '{{ remoteuser }}' 
+    args:
+        creates: '/home/{{ remoteuser }}'
+
+# === OR ======
+#  - name: "setup | creating user on remote host"
+#    user: 
+#        name: '{{ remoteuser }}' 
+#        create_home: yes
+
+  - name: "setup | create password"
+    shell: usermod -p $( echo '{{ remotepassword }}' | openssl passwd -1 -stdin ) '{{remoteuser}}'
+    args:
+      executable: /bin/bash
+
+## https://docs.ansible.com/ansible/latest/modules/authorized_key_module.html?highlight=authorized_key
+  - name: "Copying authorized_keys file"
+    authorized_key:
+        state: present
+        user: '{{ remoteuser  }}'
+        key: "{{ lookup('file','id_rsa.pub') }}"
+        path: '/home/{{ remoteuser }}/.ssh/authorized_keys'
+        manage_dir: False
+
+

@@ -1,0 +1,33 @@
+---
+#This is comment.
+#https://docs.ansible.com/ansible/latest/modules/shell_module.html
+- hosts: test-server
+  remote_user: root
+  tasks:
+  - name: "1.Executing Shell commands for simple Print"
+    shell: echo "Hello Ansible `hostname`" >> /root/tmp
+    args:
+      executable: /bin/bash
+      msg: True
+
+  - name: "Changing and printing my working Directory"
+    shell: pwd && date >> log.out
+    args:
+      chdir: /var/log/path/mypath
+      creates: mylog.txt
+      executable: /bin/bash
+
+  - name: "Running script and Redirecting standard output."
+    shell: cat file 1> output.out 2> error.out
+    args:
+      chdir: /var/log/path/mypath
+      executable: /bin/bash
+      msg: True
+
+  - name: "Curl to url using socks proxy"
+    shell: curl --socks5 localhost:9000 http://www.ansible.com 2> curl-error.out 1> curl-out.out
+    args:
+      msg: False
+      warn: no
+      executable: /bin/bash
+      chdir: /var/log/path/mypath
