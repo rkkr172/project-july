@@ -1,0 +1,10 @@
+---
+- hosts: test-server
+  #remote_user: mohan
+  vars:
+        ansible_ssh_user: 'mohan'
+        ansible_password: '123456'
+        ansible_port: '2222'
+  tasks:
+        - name: "print simple command"
+          command: cat /usr/bin/myscript.sh

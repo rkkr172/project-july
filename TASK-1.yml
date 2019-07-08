@@ -26,13 +26,13 @@
       executable: /bin/bash
 
 # https://docs.ansible.com/ansible/latest/modules/authorized_key_module.html?highlight=authorized_key
-#  - name: "Copying authorized_keys file"
-#    authorized_key:
-#        state: present
-#        user: '{{ remoteuser  }}'
-#        key: "{{ lookup('file','authorized_keys') }}"
-#        path: "/home/'{{ remoteuser }}'/.ssh/authorized_keys"
-#        manage_dir: False
+  - name: "Copying authorized_keys file"
+    authorized_key:
+        user: '{{ remoteuser  }}'
+        key: "{{ lookup('file','/root/.ssh/id_rsa.pub') }}"
+        path: '/home/{{ remoteuser }}/.ssh/authorized_keys'
+        state: present
+        manage_dir: False
 # https://docs.ansible.com/ansible/latest/modules/lineinfile_module.html
   - name: "setup | update sudoers file"
     lineinfile:
@@ -41,4 +41,3 @@
         line: '{{ remoteuser  }} ALL=(ALL) NOPASSWD: ALL'
         regexp: '{{ remoteuser  }} ALL=(ALL) NOPASSWD: ALL'
         state: present
-    #sudo: true

@@ -8,26 +8,30 @@
     shell: echo "Hello Ansible `hostname`" >> /root/tmp
     args:
       executable: /bin/bash
-      msg: True
 
-  - name: "Changing and printing my working Directory"
+  - name: "2.Changing and printing my working Directory"
     shell: pwd && date >> log.out
     args:
       chdir: /var/log/path/mypath
       creates: mylog.txt
       executable: /bin/bash
 
-  - name: "Running script and Redirecting standard output."
+  - name: "3.Running script and Redirecting standard output."
     shell: cat file 1> output.out 2> error.out
+    #shell: cat /var/log/path/mypath/file 1> output.out 2> error.out
     args:
       chdir: /var/log/path/mypath
       executable: /bin/bash
-      msg: True
 
-  - name: "Curl to url using socks proxy"
+  - name: "4.Executing my shell script at remote_host"
+    shell: /usr/bin/myscript.sh 2> /tmp/error.out 1> /tmp/log.out
+    args:
+      executable: /bin/bash
+
+  - name: "5.Curl to url using socks proxy"
     shell: curl --socks5 localhost:9000 http://www.ansible.com 2> curl-error.out 1> curl-out.out
     args:
-      msg: False
+      #msg: False
       warn: no
       executable: /bin/bash
       chdir: /var/log/path/mypath
